@@ -12,7 +12,7 @@ const TaskDetailModal = ({ isVisible, category, tasks, onClose }) => {
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitle}>
-            {category ? category.charAt(0).toUpperCase() + category.slice(1) : ''} Tasks
+            {category === 'inProgress' ? 'In Progress' : (category ? category.charAt(0).toUpperCase() + category.slice(1) : '')} Tasks
           </Text>
           <FlatList
             data={tasks}

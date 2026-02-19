@@ -1,6 +1,8 @@
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import axios from 'axios';
 import DashboardChart from './components/DashboardChart';
 import TaskDetailModal from './components/TaskDetailModal';
@@ -57,25 +59,27 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>OpenClaw Progress Dashboard</Text>
-      
-      {progress && (
-        <DashboardChart 
-          data={progress.summary} 
-          onPress={handleSliceClick} 
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>OpenClaw Progress Dashboard</Text>
+        
+        {progress && (
+          <DashboardChart 
+            data={progress.summary} 
+            onPress={handleSliceClick} 
+          />
+        )}
+
+        <TaskDetailModal
+          isVisible={modalVisible}
+          category={selectedCategory}
+          tasks={progress?.tasks[selectedCategory] || []}
+          onClose={() => setModalVisible(false)}
         />
-      )}
 
-      <TaskDetailModal
-        isVisible={modalVisible}
-        category={selectedCategory}
-        tasks={progress?.tasks[selectedCategory] || []}
-        onClose={() => setModalVisible(false)}
-      />
-
-      <StatusBar style="auto" />
-    </View>
+        <StatusBar style="auto" />
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
