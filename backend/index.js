@@ -1,7 +1,7 @@
 const express = require('express');
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
-const glob = require('glob');
+const { glob } = require('glob');
 const { parseMarkdown } = require('./utils/parser');
 const app = express();
 
@@ -9,40 +9,49 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.get('/api/progress', (req, res) => {
+app.get('/api/progress', async (req, res) => {
   const workspacePath = process.env.WORKSPACE_PATH || '/home/lubby/.openclaw/workspace';
   
-  const result = {
+  const emptyResult = {
     summary: { completed: 0, inProgress: 0, pending: 0 },
     tasks: { completed: [], inProgress: [], pending: [] }
   };
 
   try {
-    const files = glob.sync('**/PROGRESS.md', { cwd: workspacePath, absolute: true });
+    const files = await glob('**/PROGRESS.md', { cwd: workspacePath, absolute: true });
     
-    files.forEach(file => {
-      try {
-        const content = fs.readFileSync(file, 'utf8');
-        const parsed = parseMarkdown(content);
-        
-        // Aggregate summary
-        result.summary.completed += parsed.summary.completed;
-        result.summary.inProgress += parsed.summary.inProgress;
-        result.summary.pending += parsed.summary.pending;
-        
-        // Aggregate tasks
-        result.tasks.completed.push(...parsed.tasks.completed);
-        result.tasks.inProgress.push(...parsed.tasks.inProgress);
-        result.tasks.pending.push(...parsed.tasks.pending);
-      } catch (err) {
-        console.error(`Error reading or parsing file ${file}:`, err);
-      }
-    });
+    const parseResults = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const content = await fs.readFile(file, 'utf8');
+          return parseMarkdown(content);
+        } catch (err) {
+          console.error(`Error reading or parsing file ${file}:`, err);
+          return null;
+        }
+      })
+    );
+
+    const aggregated = parseResults
+      .filter(result => result !== null)
+      .reduce((acc, curr) => ({
+        summary: {
+          completed: acc.summary.completed + curr.summary.completed,
+          inProgress: acc.summary.inProgress + curr.summary.inProgress,
+          pending: acc.summary.pending + curr.summary.pending,
+        },
+        tasks: {
+          completed: [...acc.tasks.completed, ...curr.tasks.completed],
+          inProgress: [...acc.tasks.inProgress, ...curr.tasks.inProgress],
+          pending: [...acc.tasks.pending, ...curr.tasks.pending],
+        }
+      }), emptyResult);
+
+    res.json(aggregated);
   } catch (err) {
     console.error('Error finding PROGRESS.md files:', err);
+    res.json(emptyResult);
   }
-
-  res.json(result);
 });
 
 module.exports = app;
