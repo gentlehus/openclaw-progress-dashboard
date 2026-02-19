@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, Platform } from 'react-native';
+import Constants from 'expo-constants';
 import axios from 'axios';
 import DashboardChart from './components/DashboardChart';
 import TaskDetailModal from './components/TaskDetailModal';
 
-const API_BASE_URL = '/api';
+const getApiBaseUrl = () => {
+  if (Platform.OS === 'web') {
+    return '/api';
+  }
+  
+  // Get the IP address of the host machine from Expo constants
+  const debuggerHost = Constants.expoConfig?.hostUri;
+  const address = debuggerHost?.split(':')[0];
+  
+  // Use port 8081 which is the default for Expo's dev server (which also hosts the API routes)
+  return address ? `http://${address}:8081/api` : '/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export default function App() {
   const [progress, setProgress] = useState(null);
