@@ -5,7 +5,7 @@ import axios from 'axios';
 import DashboardChart from './components/DashboardChart';
 import TaskDetailModal from './components/TaskDetailModal';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 export default function App() {
   const [progress, setProgress] = useState(null);
