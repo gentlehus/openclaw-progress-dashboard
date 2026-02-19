@@ -1,7 +1,7 @@
-const { parseMarkdown } = require('./parser');
+import { parseMarkdown } from './parser';
 
 describe('parseMarkdown', () => {
-  test('should correctly parse various task formats from markdown', () => {
+  it('should correctly parse various task formats from markdown', () => {
     const markdown = `
 # Project Progress
 
@@ -54,19 +54,19 @@ Dont match - [ ] pending here.
     expect(result).toEqual(expected);
   });
 
-  test('should capture task title correctly even with unusual characters', () => {
+  it('should capture task title correctly even with unusual characters', () => {
     const markdown = '- [x] Task with [brackets] and (parentheses)';
     const result = parseMarkdown(markdown);
     expect(result.tasks.completed).toContain('Task with [brackets] and (parentheses)');
   });
 
-  test('should trim whitespace from the beginning and end of task titles', () => {
+  it('should trim whitespace from the beginning and end of task titles', () => {
     const markdown = '✅    Spaces everywhere    ';
     const result = parseMarkdown(markdown);
     expect(result.tasks.completed).toContain('Spaces everywhere');
   });
 
-  test('should handle empty or null input', () => {
+  it('should handle empty or null input', () => {
     const expected = {
       summary: { completed: 0, inProgress: 0, pending: 0 },
       tasks: {

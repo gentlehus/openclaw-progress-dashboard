@@ -38,7 +38,7 @@ function createInitialResult() {
  * @param {string} text The markdown text to parse.
  * @returns {object} The parsed summary and tasks.
  */
-function parseMarkdown(text) {
+export function parseMarkdown(text) {
   const result = createInitialResult();
 
   if (!text) return result;
@@ -68,4 +68,4 @@ function parseMarkdown(text) {
   return result;
 }
 
-module.exports = { parseMarkdown };
+

@@ -52,7 +52,7 @@ describe('DashboardChart', () => {
     ]);
   });
 
-  it('handles all zero values by providing empty data to VictoryPie', () => {
+  it('handles all zero values by returning null', () => {
     const data = { completed: 0, inProgress: 0, pending: 0 };
     let tree;
     renderer.act(() => {
@@ -60,6 +60,6 @@ describe('DashboardChart', () => {
     });
     const json = tree.toJSON();
     
-    expect(json.props.data).toEqual([]);
+    expect(json).toBeNull();
   });
 });
