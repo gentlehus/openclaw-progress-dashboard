@@ -1,44 +1,69 @@
+const STATUS_KEYS = ['completed', 'inProgress', 'pending'];
+
+const PATTERNS = {
+  completed: [
+    /^(?:#+\s*)?- \[x\] (.*)/,
+    /^(?:#+\s*)?\[已完成\] (.*)/,
+    /^(?:#+\s*)?✅ (.*)/
+  ],
+  inProgress: [
+    /^(?:#+\s*)?🚧 (.*)/,
+    /^(?:#+\s*)?\[进行中\] (.*)/
+  ],
+  pending: [
+    /^(?:#+\s*)?- \[ \] (.*)/,
+    /^(?:#+\s*)?\[待完成\] (.*)/,
+    /^(?:#+\s*)?⏳ (.*)/
+  ]
+};
+
+/**
+ * Creates an initial result structure.
+ * @returns {object}
+ */
+function createInitialResult() {
+  const result = {
+    summary: {},
+    tasks: {}
+  };
+  for (const key of STATUS_KEYS) {
+    result.summary[key] = 0;
+    result.tasks[key] = [];
+  }
+  return result;
+}
+
 /**
  * Parses markdown text for task progress.
  * @param {string} text The markdown text to parse.
  * @returns {object} The parsed summary and tasks.
  */
 function parseMarkdown(text) {
-  const result = {
-    summary: { completed: 0, inProgress: 0, pending: 0 },
-    tasks: {
-      completed: [],
-      inProgress: [],
-      pending: []
-    }
-  };
+  const result = createInitialResult();
 
   if (!text) return result;
 
   const lines = text.split('\n');
 
-  const patterns = {
-    completed: [/- \[x\] (.*)/, /\[已完成\] (.*)/, /✅ (.*)/],
-    inProgress: [/🚧 (.*)/, /\[进行中\] (.*)/],
-    pending: [/- \[ \] (.*)/, /\[待完成\] (.*)/, /⏳ (.*)/]
-  };
-
-  lines.forEach(line => {
+  for (const line of lines) {
     const trimmedLine = line.trim();
-    if (!trimmedLine) return;
+    if (!trimmedLine) continue;
 
-    for (const [status, regexes] of Object.entries(patterns)) {
+    let matched = false;
+    for (const [status, regexes] of Object.entries(PATTERNS)) {
       for (const regex of regexes) {
         const match = trimmedLine.match(regex);
         if (match) {
           const taskTitle = match[1].trim();
           result.tasks[status].push(taskTitle);
           result.summary[status]++;
-          return; // Move to the next line once a match is found
+          matched = true;
+          break;
         }
       }
+      if (matched) break;
     }
-  });
+  }
 
   return result;
 }
