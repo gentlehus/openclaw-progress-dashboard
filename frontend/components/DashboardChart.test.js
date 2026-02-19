@@ -19,9 +19,9 @@ describe('DashboardChart', () => {
     expect(json).toBeDefined();
     expect(json.type).toBe('VictoryPie');
     expect(json.props.data).toEqual([
-      { x: 'Completed', y: 10 },
-      { x: 'In Progress', y: 5 },
-      { x: 'Pending', y: 2 }
+      { x: 'Completed', y: 10, fill: '#4CAF50', category: 'completed' },
+      { x: 'In Progress', y: 5, fill: '#FF9800', category: 'inProgress' },
+      { x: 'Pending', y: 2, fill: '#9E9E9E', category: 'pending' }
     ]);
   });
 
@@ -33,6 +33,33 @@ describe('DashboardChart', () => {
     });
     const json = tree.toJSON();
     
-    expect(json.props.colorScale).toEqual(['#4CAF50', '#FF9800', '#9E9E9E']);
+    expect(json.props.data[0].fill).toBe('#4CAF50');
+    expect(json.props.data[1].fill).toBe('#FF9800');
+    expect(json.props.data[2].fill).toBe('#9E9E9E');
+  });
+
+  it('filters out items with zero value to avoid VictoryPie sensitivity', () => {
+    const data = { completed: 10, inProgress: 0, pending: 5 };
+    let tree;
+    renderer.act(() => {
+      tree = renderer.create(<DashboardChart data={data} />);
+    });
+    const json = tree.toJSON();
+    
+    expect(json.props.data).toEqual([
+      { x: 'Completed', y: 10, fill: '#4CAF50', category: 'completed' },
+      { x: 'Pending', y: 5, fill: '#9E9E9E', category: 'pending' }
+    ]);
+  });
+
+  it('handles all zero values by providing empty data to VictoryPie', () => {
+    const data = { completed: 0, inProgress: 0, pending: 0 };
+    let tree;
+    renderer.act(() => {
+      tree = renderer.create(<DashboardChart data={data} />);
+    });
+    const json = tree.toJSON();
+    
+    expect(json.props.data).toEqual([]);
   });
 });

@@ -1,20 +1,38 @@
 import React from 'react';
 import { VictoryPie } from 'victory-native';
 
-const DashboardChart = ({ data }) => {
+const DashboardChart = ({ data, onPress }) => {
   const chartData = [
-    { x: 'Completed', y: data.completed },
-    { x: 'In Progress', y: data.inProgress },
-    { x: 'Pending', y: data.pending },
-  ];
-
-  const colorScale = ['#4CAF50', '#FF9800', '#9E9E9E'];
+    { x: 'Completed', y: data.completed, fill: '#4CAF50', category: 'completed' },
+    { x: 'In Progress', y: data.inProgress, fill: '#FF9800', category: 'inProgress' },
+    { x: 'Pending', y: data.pending, fill: '#9E9E9E', category: 'pending' },
+  ].filter(item => item.y > 0);
 
   return (
     <VictoryPie
       data={chartData}
-      colorScale={colorScale}
+      style={{
+        data: {
+          fill: ({ datum }) => datum.fill
+        }
+      }}
       labels={({ datum }) => `${datum.x}: ${datum.y}`}
+      events={[{
+        target: "data",
+        eventHandlers: {
+          onPress: () => {
+            return [
+              {
+                target: "data",
+                mutation: ({ datum }) => {
+                  if (onPress) onPress(datum.category);
+                  return null;
+                }
+              }
+            ];
+          }
+        }
+      }]}
     />
   );
 };
