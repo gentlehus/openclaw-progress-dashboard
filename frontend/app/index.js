@@ -74,7 +74,7 @@ export default function Dashboard() {
     <View style={styles.container}>
       <Text style={styles.title}>OpenClaw Progress Dashboard</Text>
       
-      {progress && (
+      {progress?.summary && (
         <DashboardChart 
           data={progress.summary} 
           onPress={handleSliceClick} 

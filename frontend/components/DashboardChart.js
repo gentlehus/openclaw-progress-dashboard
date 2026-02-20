@@ -3,9 +3,9 @@ import { VictoryPie } from 'victory-native';
 
 const DashboardChart = ({ data, onPress }) => {
   const chartData = [
-    { x: 'Completed', y: data.completed || 0, fill: '#4CAF50', category: 'completed' },
-    { x: 'In Progress', y: data.inProgress || 0, fill: '#FF9800', category: 'inProgress' },
-    { x: 'Pending', y: data.pending || 0, fill: '#9E9E9E', category: 'pending' },
+    { x: 'Completed', y: data?.completed || 0, fill: '#4CAF50', category: 'completed' },
+    { x: 'In Progress', y: data?.inProgress || 0, fill: '#FF9800', category: 'inProgress' },
+    { x: 'Pending', y: data?.pending || 0, fill: '#9E9E9E', category: 'pending' },
   ].filter(item => item.y > 0);
 
   if (chartData.length === 0) return null;
