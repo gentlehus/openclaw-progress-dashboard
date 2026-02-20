@@ -84,7 +84,7 @@ export default function Dashboard() {
       <TaskDetailModal
         isVisible={modalVisible}
         category={selectedCategory}
-        tasks={progress?.tasks[selectedCategory] || []}
+        tasks={progress?.tasks?.[selectedCategory] || []}
         onClose={() => setModalVisible(false)}
       />
 
